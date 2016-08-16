@@ -66,6 +66,42 @@ public:
 };
 
 
+class JsonQueryUnquoted : public ScalarFunction {
+public:
+
+
+	virtual void processBlock(Vertica::ServerInterface &,
+	                          Vertica::BlockReader &argReader,
+	                          Vertica::BlockWriter &resWriter)
+	{
+		do {
+			const Vertica::VString &jsonSrc = argReader.getStringRef(0);
+			const Vertica::VString &querySrc = argReader.getStringRef(1);
+			Vertica::VString &resSrc = resWriter.getStringRef();
+
+			json_slice_t jsonIn = json_slice_new(jsonSrc.data(), jsonSrc.length());
+			json_slice_t jsonOut;
+
+			bool status = json_slice_query(&jsonIn,
+			                               querySrc.data(), querySrc.length(),
+			                               &jsonOut);
+			if (status) {
+				if (jsonOut.len >= 2 &&
+				    jsonOut.src[0] == '"' &&
+				    jsonOut.src[jsonOut.len - 1] == '"') {
+					resSrc.copy(jsonOut.src + 1, jsonOut.len - 2);
+				} else {
+					resSrc.copy(jsonOut.src, jsonOut.len);
+				}
+			} else {
+				resSrc.setNull();
+			}
+			resWriter.next();
+		} while (argReader.next());
+	}
+};
+
+
 class AbstractJsonQueryFactory : public ScalarFunctionFactory {
 public:
 
@@ -114,5 +150,16 @@ public:
 };
 
 
+class JsonQueryUnquotedFactory : public AbstractJsonQueryFactory {
+public:
+
+	virtual ScalarFunction *createScalarFunction(Vertica::ServerInterface &iface)
+	{
+		return vt_createFuncObj(iface.allocator, JsonQueryUnquoted);
+	}
+};
+
+
 RegisterFactory(JsonQueryFactory);
 RegisterFactory(JsonQueryStringFactory);
+RegisterFactory(JsonQueryUnquotedFactory);
