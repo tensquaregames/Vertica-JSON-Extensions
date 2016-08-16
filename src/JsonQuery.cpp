@@ -8,7 +8,8 @@ extern "C" {
 }
 
 
-class JsonQuery : public ScalarFunction {
+template<class Q>
+class AbstractJsonQuery : public ScalarFunction {
 public:
 
 	virtual void processBlock(Vertica::ServerInterface &,
@@ -25,7 +26,7 @@ public:
 			if (json_slice_query(&jsonIn,
 			                     querySrc.data(), querySrc.length(),
 			                     &jsonOut)) {
-				resSrc.copy(jsonOut.src, jsonOut.len);
+				Q::copyResult(jsonOut, resSrc);
 			} else {
 				resSrc.setNull();
 			}
@@ -34,70 +35,35 @@ public:
 	}
 };
 
-
-class JsonQueryString : public ScalarFunction {
+class JsonQuery : public AbstractJsonQuery<JsonQuery> {
 public:
 
-	virtual void processBlock(Vertica::ServerInterface &,
-	                          Vertica::BlockReader &argReader,
-	                          Vertica::BlockWriter &resWriter)
-	{
-		do {
-			const Vertica::VString &jsonSrc = argReader.getStringRef(0);
-			const Vertica::VString &querySrc = argReader.getStringRef(1);
-			Vertica::VString &resSrc = resWriter.getStringRef();
-
-			json_slice_t jsonIn = json_slice_new(jsonSrc.data(), jsonSrc.length());
-			json_slice_t jsonOut;
-
-			bool status = json_slice_query(&jsonIn,
-			                               querySrc.data(), querySrc.length(),
-			                               &jsonOut);
-			if (status &&
-			    jsonOut.len >= 2 &&
-			    jsonOut.src[0] == '"' && jsonOut.src[jsonOut.len - 1] == '"') {
-				resSrc.copy(jsonOut.src + 1, jsonOut.len - 2);
-			} else {
-				resSrc.setNull();
-			}
-			resWriter.next();
-		} while (argReader.next());
+	static void copyResult(const json_slice_t &json, Vertica::VString &result) {
+		result.copy(json.src, json.len);
 	}
 };
 
-
-class JsonQueryUnquoted : public ScalarFunction {
+class JsonQueryString : public AbstractJsonQuery<JsonQueryString> {
 public:
 
+	static void copyResult(const json_slice_t &json, Vertica::VString &result) {
+		if (json.len >= 2 && json.src[0] == '"' && json.src[json.len - 1] == '"') {
+			result.copy(json.src + 1, json.len - 2);
+		} else {
+			result.setNull();
+		}
+	}
+};
 
-	virtual void processBlock(Vertica::ServerInterface &,
-	                          Vertica::BlockReader &argReader,
-	                          Vertica::BlockWriter &resWriter)
-	{
-		do {
-			const Vertica::VString &jsonSrc = argReader.getStringRef(0);
-			const Vertica::VString &querySrc = argReader.getStringRef(1);
-			Vertica::VString &resSrc = resWriter.getStringRef();
+class JsonQueryUnquoted : public AbstractJsonQuery<JsonQueryUnquoted> {
+public:
 
-			json_slice_t jsonIn = json_slice_new(jsonSrc.data(), jsonSrc.length());
-			json_slice_t jsonOut;
-
-			bool status = json_slice_query(&jsonIn,
-			                               querySrc.data(), querySrc.length(),
-			                               &jsonOut);
-			if (status) {
-				if (jsonOut.len >= 2 &&
-				    jsonOut.src[0] == '"' &&
-				    jsonOut.src[jsonOut.len - 1] == '"') {
-					resSrc.copy(jsonOut.src + 1, jsonOut.len - 2);
-				} else {
-					resSrc.copy(jsonOut.src, jsonOut.len);
-				}
-			} else {
-				resSrc.setNull();
-			}
-			resWriter.next();
-		} while (argReader.next());
+	static void copyResult(const json_slice_t &json, Vertica::VString &result) {
+		if (json.len >= 2 && json.src[0] == '"' && json.src[json.len - 1] == '"') {
+			result.copy(json.src + 1, json.len - 2);
+		} else {
+			result.copy(json.src, json.len);
+		}
 	}
 };
 
@@ -129,7 +95,6 @@ public:
 	}
 };
 
-
 class JsonQueryFactory : public AbstractJsonQueryFactory {
 public:
 
@@ -139,7 +104,6 @@ public:
 	}
 };
 
-
 class JsonQueryStringFactory : public AbstractJsonQueryFactory {
 public:
 
@@ -148,7 +112,6 @@ public:
 		return vt_createFuncObj(iface.allocator, JsonQueryString);
 	}
 };
-
 
 class JsonQueryUnquotedFactory : public AbstractJsonQueryFactory {
 public:
