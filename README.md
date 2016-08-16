@@ -49,7 +49,7 @@ run the following command:
 If you wish to build the library with debugging capabilities, you might want
 to provide `DEBUG` argument, like this:
 
-   make DEBUG=true build
+    make DEBUG=true build
 
 
 Installation
@@ -78,7 +78,7 @@ To verify that everything works as expected, you can use the following commands:
     make memtest
     make examples
 
-Note that the `memtest` task requires Valgrind to available on your `PATH`.
+Note that the `memtest` task requires Valgrind to be available on your `PATH`.
 
 
 FAQ
@@ -118,5 +118,5 @@ will yield a string with JSON string value `"true"`. It makes sense but can
 be very inconvenient to work with. To solve this, there is a `JsonQueryString`
 function that operates almost exactly as `JsonQuery` but returns unquoted
 strings (and fails with `NULL` if the selected value was not a string). For
-example, `JsonQueryString('{ "foo": "bar" }`, 'foo') will yield a SQL string
+example, `JsonQueryString('{ "foo": "bar" }, 'foo')` will yield an SQL string
 with value `bar` (without unnecessary quotes).
