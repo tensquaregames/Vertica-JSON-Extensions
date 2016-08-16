@@ -114,9 +114,19 @@ Then empty selector will match it. For example, to access `true` in
 `JsonQuery` takes a JSON value (as a string object) and returns a JSON value
 (as a string object). So, `JsonQuery('{ "foo": true }', 'foo')` will yield
 a string with JSON boolean value `true` and `JsonQuery('{ "foo": "true" }')`
-will yield a string with JSON string value `"true"`. It makes sense but can
-be very inconvenient to work with. To solve this, there is a `JsonQueryString`
-function that operates almost exactly as `JsonQuery` but returns unquoted
-strings (and fails with `NULL` if the selected value was not a string). For
-example, `JsonQueryString('{ "foo": "bar" }, 'foo')` will yield an SQL string
-with value `bar` (without unnecessary quotes).
+will yield a string with JSON string value `"true"` (with quotemarks).
+
+It makes sense but can be very inconvenient to work with. To solve this, there
+is a `JsonQueryString` function that operates almost exactly as `JsonQuery` but
+returns unquoted strings (and fails with `NULL` if the selected value is not a
+string). For example, `JsonQueryString('{ "foo": "bar" }, 'foo')` will yield an
+SQL string with value `bar` (without unnecessary quotes).
+
+Finally, there is also a `JsonQueryUnquoted` that unquotes the returned results
+if it is a string value but does not fail if it is not a string. So, for string
+values `JsonQueryString` and `JsonQueryUnquoted` behave the same way but for
+other JSON values (integers, booleans, arrays) the former one will fail whereas
+the latter one will yield the value which may or may not be what you want,
+depending on your use.case.
+
+Refer to `examples/strings.sql` to see more usage samples.
