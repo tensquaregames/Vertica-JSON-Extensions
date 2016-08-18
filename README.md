@@ -37,6 +37,23 @@ is string with selector used to extract information. For example,
 will yield SQL `TRUE` value. Check the `examples/` directory to learn more
 about using the selector syntax in your queries.
 
+The extension also comes with a `JsonArrayUnnest` transform function that,
+similarly to the `unnest` in PostgreSQL, expands an JSON array values into a
+set of rows. For example,
+
+    SELECT JsonArrayUnnest('[1, 2, 3]') OVER ();
+
+will yield
+
+     JsonArrayUnnest
+    -----------------
+     1
+     2
+     3
+    (3 rows)
+
+Refer to the `examples/unnest.sql` for more sophisticated usage samples.
+
 
 Building
 --------

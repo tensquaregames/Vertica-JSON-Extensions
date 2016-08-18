@@ -41,6 +41,7 @@ examples:
 	$(VSQL) -f examples/dots.sql
 	$(VSQL) -f examples/table.sql
 	$(VSQL) -f examples/strings.sql
+	$(VSQL) -f examples/unnest.sql
 
 install: ddl/install.sql lib/JsonLib.so
 	$(VSQL) -f $<
@@ -54,7 +55,7 @@ clean:
 
 # Build the library.
 
-lib/JsonLib.so: build/Vertica.o build/JsonQuery.o build/json/selector.o build/json/slice.o
+lib/JsonLib.so: build/Vertica.o build/JsonQuery.o build/JsonUnnest.o build/json/selector.o build/json/slice.o
 	mkdir -p `dirname $@`
 	$(CXX) $(LDFLAGS) -o $@ $^
 
@@ -64,7 +65,11 @@ build/Vertica.o: $(VERTICA_SDK_INCLUDE)/Vertica.cpp
 
 build/JsonQuery.o: src/JsonQuery.cpp include/json/slice.h include/json/selector.h
 	mkdir -p `dirname $@`
-	$(CXX) -I $(VERTICA_SDK_INCLUDE) -I $(INCLUDE) $(CFLAGS) -c -o $@ $<
+	$(CXX) -I $(VERTICA_SDK_INCLUDE) -I $(INCLUDE) $(CXXFLAGS) -c -o $@ $<
+
+build/JsonUnnest.o: src/JsonUnnest.cpp include/json/slice.h
+	mkdir -p `dirname $@`
+	$(CXX) -I $(VERTICA_SDK_INCLUDE) -I $(INCLUDE) $(CXXFLAGS) -c -o $@ $<
 
 build/json/selector.o: src/json/selector.c include/json/selector.h
 	mkdir -p `dirname $@`

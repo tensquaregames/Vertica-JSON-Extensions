@@ -409,3 +409,38 @@ json_slice_query(const json_slice_t *input,
 	state.end = input->src + input->len;
 	return traverse_value(&state, &iter, output);
 }
+
+json_array_iter_result_t
+json_array_iter_init(json_array_iter_t *iter, const json_slice_t *input)
+{
+	parse_state_t state;
+	state.begin = input->src;
+	state.end = input->src + input->len;
+
+	if (!skip_whitespace(&state)) return JSON_ARRAY_ITER_FAIL;
+	if (!skip_char(&state, '[')) return JSON_ARRAY_ITER_FAIL;
+
+	iter->begin = state.begin;
+	iter->end = state.end;
+	return JSON_ARRAY_ITER_OK;
+}
+
+json_array_iter_result_t
+json_array_iter_next(json_array_iter_t *iter, json_slice_t *result)
+{
+	parse_state_t state;
+	state.begin = iter->begin;
+	state.end = iter->end;
+
+	if (!skip_whitespace(&state)) return JSON_ARRAY_ITER_FAIL;
+	if (state.begin == state.end) return JSON_ARRAY_ITER_FAIL;
+	if (*state.begin == ']') return JSON_ARRAY_ITER_END;
+
+	if (!parse_value(&state, result)) return JSON_ARRAY_ITER_FAIL;
+	if (!skip_whitespace(&state)) return JSON_ARRAY_ITER_FAIL;
+	if (state.begin == state.end) return JSON_ARRAY_ITER_FAIL;
+	if (*state.begin == ',') state.begin++;
+	iter->begin = state.begin;
+	/* No need to set `iter->end` since it does not change. */
+	return JSON_ARRAY_ITER_OK;
+}

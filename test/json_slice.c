@@ -167,5 +167,83 @@ int main()
 	STRING_TEST_POSITIVE(jsoncheck3_json, "JSON Test Pattern pass3.In this test", "\"It is an object.\"");
 	free(jsoncheck3_json);
 
+
+	json_slice_t iter_json;
+	json_array_iter_t iter;
+
+	iter_json.src = "[]";
+	iter_json.len = strlen(iter_json.src);
+	assert(json_array_iter_init(&iter, &iter_json) == JSON_ARRAY_ITER_OK);
+	assert(json_array_iter_next(&iter, &iter_json) == JSON_ARRAY_ITER_END);
+
+	iter_json.src = "[ \n\t   ]";
+	iter_json.len = strlen(iter_json.src);
+	assert(json_array_iter_init(&iter, &iter_json) == JSON_ARRAY_ITER_OK);
+	assert(json_array_iter_next(&iter, &iter_json) == JSON_ARRAY_ITER_END);
+
+	iter_json.src = "[1]";
+	iter_json.len = strlen(iter_json.src);
+	assert(json_array_iter_init(&iter, &iter_json) == JSON_ARRAY_ITER_OK);
+	assert(json_array_iter_next(&iter, &iter_json) == JSON_ARRAY_ITER_OK);
+	assert(strncmp(iter_json.src, "1", iter_json.len) == 0);
+
+	iter_json.src = "   [   1 \t  \n           ]    ";
+	iter_json.len = strlen(iter_json.src);
+	assert(json_array_iter_init(&iter, &iter_json) == JSON_ARRAY_ITER_OK);
+	assert(json_array_iter_next(&iter, &iter_json) == JSON_ARRAY_ITER_OK);
+	assert(strncmp(iter_json.src, "1", iter_json.len) == 0);
+
+	iter_json.src = "[1,2,3]";
+	iter_json.len = strlen(iter_json.src);
+	assert(json_array_iter_init(&iter, &iter_json) == JSON_ARRAY_ITER_OK);
+	assert(json_array_iter_next(&iter, &iter_json) == JSON_ARRAY_ITER_OK);
+	assert(strncmp(iter_json.src, "1", iter_json.len) == 0);
+	assert(json_array_iter_next(&iter, &iter_json) == JSON_ARRAY_ITER_OK);
+	assert(strncmp(iter_json.src, "2", iter_json.len) == 0);
+	assert(json_array_iter_next(&iter, &iter_json) == JSON_ARRAY_ITER_OK);
+	assert(strncmp(iter_json.src, "3", iter_json.len) == 0);
+	assert(json_array_iter_next(&iter, &iter_json) == JSON_ARRAY_ITER_END);
+
+	iter_json.src = "    [ \n   1,  \t   2,  \n   3\t  ]   ";
+	iter_json.len = strlen(iter_json.src);
+	assert(json_array_iter_init(&iter, &iter_json) == JSON_ARRAY_ITER_OK);
+	assert(json_array_iter_next(&iter, &iter_json) == JSON_ARRAY_ITER_OK);
+	assert(strncmp(iter_json.src, "1", iter_json.len) == 0);
+	assert(json_array_iter_next(&iter, &iter_json) == JSON_ARRAY_ITER_OK);
+	assert(strncmp(iter_json.src, "2", iter_json.len) == 0);
+	assert(json_array_iter_next(&iter, &iter_json) == JSON_ARRAY_ITER_OK);
+	assert(strncmp(iter_json.src, "3", iter_json.len) == 0);
+	assert(json_array_iter_next(&iter, &iter_json) == JSON_ARRAY_ITER_END);
+
+	iter_json.src = "[[1, 2, 3], { \"foo\": [3, 4, 5] }, [[5]]]";
+	iter_json.len = strlen(iter_json.src);
+	assert(json_array_iter_init(&iter, &iter_json) == JSON_ARRAY_ITER_OK);
+	assert(json_array_iter_next(&iter, &iter_json) == JSON_ARRAY_ITER_OK);
+	assert(strncmp(iter_json.src, "[1, 2, 3]", iter_json.len) == 0);
+	assert(json_array_iter_next(&iter, &iter_json) == JSON_ARRAY_ITER_OK);
+	assert(strncmp(iter_json.src, "{ \"foo\": [3, 4, 5] }", iter_json.len) == 0);
+	assert(json_array_iter_next(&iter, &iter_json) == JSON_ARRAY_ITER_OK);
+	assert(strncmp(iter_json.src, "[[5]]", iter_json.len) == 0);
+	assert(json_array_iter_next(&iter, &iter_json) == JSON_ARRAY_ITER_END);
+
+	iter_json.src = "[\"foo bar\", true, false, null, [1.0], [], {}]";
+	iter_json.len = strlen(iter_json.src);
+	assert(json_array_iter_init(&iter, &iter_json) == JSON_ARRAY_ITER_OK);
+	assert(json_array_iter_next(&iter, &iter_json) == JSON_ARRAY_ITER_OK);
+	assert(strncmp(iter_json.src, "\"foo bar\"", iter_json.len) == 0);
+	assert(json_array_iter_next(&iter, &iter_json) == JSON_ARRAY_ITER_OK);
+	assert(strncmp(iter_json.src, "true", iter_json.len) == 0);
+	assert(json_array_iter_next(&iter, &iter_json) == JSON_ARRAY_ITER_OK);
+	assert(strncmp(iter_json.src, "false", iter_json.len) == 0);
+	assert(json_array_iter_next(&iter, &iter_json) == JSON_ARRAY_ITER_OK);
+	assert(strncmp(iter_json.src, "null", iter_json.len) == 0);
+	assert(json_array_iter_next(&iter, &iter_json) == JSON_ARRAY_ITER_OK);
+	assert(strncmp(iter_json.src, "[1.0]", iter_json.len) == 0);
+	assert(json_array_iter_next(&iter, &iter_json) == JSON_ARRAY_ITER_OK);
+	assert(strncmp(iter_json.src, "[]", iter_json.len) == 0);
+	assert(json_array_iter_next(&iter, &iter_json) == JSON_ARRAY_ITER_OK);
+	assert(strncmp(iter_json.src, "{}", iter_json.len) == 0);
+	assert(json_array_iter_next(&iter, &iter_json) == JSON_ARRAY_ITER_END);
+
 	return 0;
 }
