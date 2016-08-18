@@ -8,7 +8,11 @@ extern "C" {
 }
 
 
-class JsonArrayUnnest : public TransformFunction {
+#define CLASS_NAME(CLASS) #CLASS
+
+
+template<class D>
+class AbstractJsonArrayUnnest : public TransformFunction {
 public:
 
 	virtual void processPartition(Vertica::ServerInterface &,
@@ -32,7 +36,7 @@ public:
 				json_array_iter_result_t result;
 				result = json_array_iter_next(&iter, &jsonOut);
 				if (result == JSON_ARRAY_ITER_OK) {
-					resWriter.getStringRef(0).copy(jsonOut.src, jsonOut.len);
+					D::copyResult(jsonOut, resWriter.getStringRef(0));
 					resWriter.next();
 				} else {
 					break;
@@ -42,8 +46,59 @@ public:
 	}
 };
 
+class JsonArrayUnnest : public AbstractJsonArrayUnnest<JsonArrayUnnest> {
+public:
 
-class JsonArrayUnnestFactory : public TransformFunctionFactory {
+	static void copyResult(const json_slice_t &json, Vertica::VString &result)
+	{
+		result.copy(json.src, json.len);
+	}
+
+	static const char *resultColumnName()
+	{
+		return "JsonArrayUnnest";
+	}
+};
+
+class JsonArrayUnnestStrings : public AbstractJsonArrayUnnest<JsonArrayUnnestStrings> {
+public:
+
+	static void copyResult(const json_slice_t &json, Vertica::VString &result)
+	{
+		if (json.len >= 2 && json.src[0] == '"' && json.src[json.len - 1] == '"') {
+			result.copy(json.src + 1, json.len - 2);
+		} else {
+			result.setNull();
+		}
+	}
+
+	static const char *resultColumnName()
+	{
+		return "JsonArrayUnnestStrings";
+	}
+};
+
+class JsonArrayUnnestUnquoted : public AbstractJsonArrayUnnest<JsonArrayUnnestUnquoted> {
+public:
+
+	static void copyResult(const json_slice_t &json, Vertica::VString &result)
+	{
+		if (json.len >= 2 && json.src[0] == '"' && json.src[json.len - 1] == '"') {
+			result.copy(json.src + 1, json.len - 2);
+		} else {
+			result.copy(json.src, json.len);
+		}
+	}
+	
+	static const char *resultColumnName()
+	{
+		return "JsonArrayUnnestUnquoted";
+	}
+};
+
+
+template<class T>
+class AbstractJsonArrayUnnestFactory : public TransformFunctionFactory {
 public:
 
 	virtual void getPrototype(Vertica::ServerInterface &,
@@ -59,14 +114,28 @@ public:
 	                           Vertica::SizedColumnTypes &resTypes)
 	{
 		const Vertica::VerticaType &jsonSrcType = argTypes.getColumnType(0);
-		resTypes.addVarchar(jsonSrcType.getStringLength(), "JsonArrayUnnest");
+		resTypes.addVarchar(jsonSrcType.getStringLength(), T::resultColumnName());
 	}
 
 	virtual TransformFunction *createTransformFunction(Vertica::ServerInterface &iface)
 	{
-		return vt_createFuncObj(iface.allocator, JsonArrayUnnest);
+		return vt_createFuncObj(iface.allocator, T);
 	}
+};
+
+class JsonArrayUnnestFactory :
+	public AbstractJsonArrayUnnestFactory<JsonArrayUnnest> {
+};
+
+class JsonArrayUnnestStringsFactory :
+	public AbstractJsonArrayUnnestFactory<JsonArrayUnnestStrings> {
+};
+
+class JsonArrayUnnestUnquotedFactory :
+	public AbstractJsonArrayUnnestFactory<JsonArrayUnnestUnquoted> {
 };
 
 
 RegisterFactory(JsonArrayUnnestFactory);
+RegisterFactory(JsonArrayUnnestStringsFactory);
+RegisterFactory(JsonArrayUnnestUnquotedFactory);
