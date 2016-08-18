@@ -6,6 +6,7 @@ extern "C" {
 #include <json/selector.h>
 #include <json/slice.h>
 }
+#include "JsonCopyResult.hpp"
 
 
 template<class Q>
@@ -35,36 +36,19 @@ public:
 	}
 };
 
-class JsonQuery : public AbstractJsonQuery<JsonQuery> {
-public:
-
-	static void copyResult(const json_slice_t &json, Vertica::VString &result) {
-		result.copy(json.src, json.len);
-	}
+class JsonQuery :
+	public JsonValueResult,
+	public AbstractJsonQuery<JsonQuery> {
 };
 
-class JsonQueryString : public AbstractJsonQuery<JsonQueryString> {
-public:
-
-	static void copyResult(const json_slice_t &json, Vertica::VString &result) {
-		if (json.len >= 2 && json.src[0] == '"' && json.src[json.len - 1] == '"') {
-			result.copy(json.src + 1, json.len - 2);
-		} else {
-			result.setNull();
-		}
-	}
+class JsonQueryString :
+	public JsonStringResult,
+	public AbstractJsonQuery<JsonQueryString> {
 };
 
-class JsonQueryUnquoted : public AbstractJsonQuery<JsonQueryUnquoted> {
-public:
-
-	static void copyResult(const json_slice_t &json, Vertica::VString &result) {
-		if (json.len >= 2 && json.src[0] == '"' && json.src[json.len - 1] == '"') {
-			result.copy(json.src + 1, json.len - 2);
-		} else {
-			result.copy(json.src, json.len);
-		}
-	}
+class JsonQueryUnquoted :
+	public JsonUnquotedResult,
+	public AbstractJsonQuery<JsonQueryUnquoted> {
 };
 
 

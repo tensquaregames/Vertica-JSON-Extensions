@@ -6,9 +6,7 @@ extern "C" {
 #include <json/selector.h>
 #include <json/slice.h>
 }
-
-
-#define CLASS_NAME(CLASS) #CLASS
+#include "JsonCopyResult.hpp"
 
 
 template<class D>
@@ -46,13 +44,10 @@ public:
 	}
 };
 
-class JsonArrayUnnest : public AbstractJsonArrayUnnest<JsonArrayUnnest> {
+class JsonArrayUnnest :
+	public JsonValueResult,
+	public AbstractJsonArrayUnnest<JsonArrayUnnest> {
 public:
-
-	static void copyResult(const json_slice_t &json, Vertica::VString &result)
-	{
-		result.copy(json.src, json.len);
-	}
 
 	static const char *resultColumnName()
 	{
@@ -60,17 +55,10 @@ public:
 	}
 };
 
-class JsonArrayUnnestStrings : public AbstractJsonArrayUnnest<JsonArrayUnnestStrings> {
+class JsonArrayUnnestStrings :
+	public JsonStringResult,
+	public AbstractJsonArrayUnnest<JsonArrayUnnestStrings> {
 public:
-
-	static void copyResult(const json_slice_t &json, Vertica::VString &result)
-	{
-		if (json.len >= 2 && json.src[0] == '"' && json.src[json.len - 1] == '"') {
-			result.copy(json.src + 1, json.len - 2);
-		} else {
-			result.setNull();
-		}
-	}
 
 	static const char *resultColumnName()
 	{
@@ -78,17 +66,10 @@ public:
 	}
 };
 
-class JsonArrayUnnestUnquoted : public AbstractJsonArrayUnnest<JsonArrayUnnestUnquoted> {
+class JsonArrayUnnestUnquoted :
+	public JsonUnquotedResult,
+	public AbstractJsonArrayUnnest<JsonArrayUnnestUnquoted> {
 public:
-
-	static void copyResult(const json_slice_t &json, Vertica::VString &result)
-	{
-		if (json.len >= 2 && json.src[0] == '"' && json.src[json.len - 1] == '"') {
-			result.copy(json.src + 1, json.len - 2);
-		} else {
-			result.copy(json.src, json.len);
-		}
-	}
 	
 	static const char *resultColumnName()
 	{
