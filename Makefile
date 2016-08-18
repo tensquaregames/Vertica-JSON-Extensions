@@ -41,6 +41,7 @@ examples:
 	$(VSQL) -f examples/dots.sql
 	$(VSQL) -f examples/table.sql
 	$(VSQL) -f examples/strings.sql
+	$(VSQL) -f examples/unnest.sql
 
 install: ddl/install.sql lib/JsonLib.so
 	$(VSQL) -f $<
