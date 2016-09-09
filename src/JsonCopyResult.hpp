@@ -1,5 +1,5 @@
 #ifndef __FILE_JSON_COPY_RESULT_HPP
-#define __FIEL_JSON_COPY_RESULT_HPP
+#define __FILE_JSON_COPY_RESULT_HPP
 
 
 #include <Vertica.h>
