@@ -1,7 +1,7 @@
 CC=gcc
 CFLAGS=-std=c99 -Wall -Wextra -pedantic -fPIC
 CXX=g++
-CXXFLAGS=-std=c++03 -Wall -Wextra -pedantic -fPIC
+CXXFLAGS=-std=c++98 -Wall -Wextra -pedantic -fPIC
 LDFLAGS=-shared
 
 ifdef DEBUG
