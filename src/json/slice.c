@@ -267,10 +267,8 @@ traverse_object(parse_state_t *state,json_selector_iter_t *iter,
 	if (!skip_whitespace(state)) return false;
 	if (!skip_char(state, '{')) return false;
 	if (!skip_whitespace(state)) return false;
-	if (state->begin != state->end && *state->begin == '}') {
-		state->begin++;
-		output->len = state->begin - output->src;
-		return true;
+	if (state->begin == state->end || *state->begin == '}') {
+		return false;
 	}
 	for (;;) {
 		json_slice_t key;
