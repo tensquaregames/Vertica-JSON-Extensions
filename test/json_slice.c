@@ -49,6 +49,18 @@ int main()
 	STRING_TEST_NEGATIVE(empty_json, "bar");
 	STRING_TEST_NEGATIVE(empty_json, "");
 
+	const char *empty_object_json = "{}";
+	STRING_TEST_NEGATIVE(empty_object_json, "foo");
+	STRING_TEST_NEGATIVE(empty_object_json, "0");
+	STRING_TEST_NEGATIVE(empty_object_json, "");
+
+	const char *empty_array_json = "[]";
+	STRING_TEST_NEGATIVE(empty_array_json, "0");
+	STRING_TEST_NEGATIVE(empty_array_json, "1");
+	STRING_TEST_NEGATIVE(empty_array_json, "2");
+	STRING_TEST_NEGATIVE(empty_array_json, "foo");
+	STRING_TEST_NEGATIVE(empty_array_json, "");
+
 	const char *emptykey_json = "{ \"\": 42, \"bar\": { \"\": true }, \"baz.\": false }";
 	STRING_TEST_POSITIVE(emptykey_json, "", "42");
 	STRING_TEST_POSITIVE(emptykey_json, "bar.", "true");
