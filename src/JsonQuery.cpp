@@ -77,6 +77,13 @@ public:
 		const Vertica::VerticaType &jsonSrcType = argTypes.getColumnType(0);
 		resTypes.addVarchar(jsonSrcType.getStringLength());
 	}
+
+	virtual void getPerInstanceResources(Vertica::ServerInterface &,
+	                                     Vertica::VResources &resources)
+	{
+		resources.nFileHandles = 0;
+		resources.scratchMemory = 0;
+	}
 };
 
 class JsonQueryFactory : public AbstractJsonQueryFactory {
