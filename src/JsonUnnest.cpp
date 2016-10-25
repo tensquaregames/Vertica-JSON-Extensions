@@ -70,7 +70,7 @@ class JsonArrayUnnestUnquoted :
 	public JsonUnquotedResult,
 	public AbstractJsonArrayUnnest<JsonArrayUnnestUnquoted> {
 public:
-	
+
 	static const char *resultColumnName()
 	{
 		return "JsonArrayUnnestUnquoted";
