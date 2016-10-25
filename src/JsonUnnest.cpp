@@ -102,6 +102,13 @@ public:
 	{
 		return vt_createFuncObj(iface.allocator, T);
 	}
+
+	virtual void getPerInstanceResources(Vertica::ServerInterface &,
+	                                     Vertica::VResources &resources)
+	{
+		resources.nFileHandles = 0;
+		resources.scratchMemory = 0;
+	}
 };
 
 class JsonArrayUnnestFactory :
