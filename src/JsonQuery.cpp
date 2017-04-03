@@ -65,9 +65,9 @@ public:
 	                          Vertica::ColumnTypes &argTypes,
 	                          Vertica::ColumnTypes &resTypes)
 	{
-		argTypes.addVarchar();
-		argTypes.addVarchar();
-		resTypes.addVarchar();
+		argTypes.addLongVarchar();
+		argTypes.addLongVarchar();
+		resTypes.addLongVarchar();
 	}
 
 	virtual void getReturnType(Vertica::ServerInterface &,
@@ -75,7 +75,7 @@ public:
 	                           Vertica::SizedColumnTypes &resTypes)
 	{
 		const Vertica::VerticaType &jsonSrcType = argTypes.getColumnType(0);
-		resTypes.addVarchar(jsonSrcType.getStringLength());
+		resTypes.addLongVarchar(jsonSrcType.getStringLength());
 	}
 
 	virtual void getPerInstanceResources(Vertica::ServerInterface &,
