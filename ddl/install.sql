@@ -12,3 +12,6 @@ CREATE FUNCTION JsonQueryUnquoted AS LANGUAGE 'C++' NAME 'JsonQueryUnquotedLongF
 CREATE TRANSFORM FUNCTION JsonArrayUnnest AS LANGUAGE 'C++' NAME 'JsonArrayUnnestFactory' LIBRARY JsonLib NOT FENCED;
 CREATE TRANSFORM FUNCTION JsonArrayUnnestStrings AS LANGUAGE 'C++' NAME 'JsonArrayUnnestStringsFactory' LIBRARY JsonLib NOT FENCED;
 CREATE TRANSFORM FUNCTION JsonArrayUnnestUnquoted AS LANGUAGE 'C++' NAME 'JsonArrayUnnestUnquotedFactory' LIBRARY JsonLib NOT FENCED;
+CREATE TRANSFORM FUNCTION JsonArrayUnnest AS LANGUAGE 'C++' NAME 'JsonArrayUnnestLongFactory' LIBRARY JsonLib NOT FENCED;
+CREATE TRANSFORM FUNCTION JsonArrayUnnestStrings AS LANGUAGE 'C++' NAME 'JsonArrayUnnestStringsLongFactory' LIBRARY JsonLib NOT FENCED;
+CREATE TRANSFORM FUNCTION JsonArrayUnnestUnquoted AS LANGUAGE 'C++' NAME 'JsonArrayUnnestUnquotedLongFactory' LIBRARY JsonLib NOT FENCED;
