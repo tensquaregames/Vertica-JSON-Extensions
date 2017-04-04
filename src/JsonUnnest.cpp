@@ -111,6 +111,28 @@ public:
 	}
 };
 
+template<class T>
+class AbstractJsonArrayUnnestLongFactory : public AbstractJsonArrayUnnestFactory<T> {
+public:
+
+	virtual void getPrototype(Vertica::ServerInterface &,
+	                          Vertica::ColumnTypes &argTypes,
+	                          Vertica::ColumnTypes &resTypes)
+	{
+		argTypes.addLongVarchar();
+		resTypes.addLongVarchar();
+	}
+
+	virtual void getReturnType(Vertica::ServerInterface &,
+	                           const Vertica::SizedColumnTypes &argTypes,
+	                           Vertica::SizedColumnTypes &resTypes)
+	{
+		const Vertica::VerticaType &jsonSrcType = argTypes.getColumnType(0);
+		resTypes.addLongVarchar(jsonSrcType.getStringLength(), T::resultColumnName());
+	}
+
+};
+
 class JsonArrayUnnestFactory :
 	public AbstractJsonArrayUnnestFactory<JsonArrayUnnest> {
 };
@@ -123,7 +145,22 @@ class JsonArrayUnnestUnquotedFactory :
 	public AbstractJsonArrayUnnestFactory<JsonArrayUnnestUnquoted> {
 };
 
+class JsonArrayUnnestLongFactory :
+	public AbstractJsonArrayUnnestLongFactory<JsonArrayUnnest> {
+};
+
+class JsonArrayUnnestStringsLongFactory :
+	public AbstractJsonArrayUnnestLongFactory<JsonArrayUnnestStrings> {
+};
+
+class JsonArrayUnnestUnquotedLongFactory :
+	public AbstractJsonArrayUnnestLongFactory<JsonArrayUnnestUnquoted> {
+};
+
 
 RegisterFactory(JsonArrayUnnestFactory);
 RegisterFactory(JsonArrayUnnestStringsFactory);
 RegisterFactory(JsonArrayUnnestUnquotedFactory);
+RegisterFactory(JsonArrayUnnestLongFactory);
+RegisterFactory(JsonArrayUnnestStringsLongFactory);
+RegisterFactory(JsonArrayUnnestUnquotedLongFactory);

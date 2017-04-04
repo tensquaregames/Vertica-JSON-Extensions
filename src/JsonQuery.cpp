@@ -86,6 +86,29 @@ public:
 	}
 };
 
+class AbstractJsonQueryLongFactory : public ScalarFunctionFactory {
+public:
+
+	virtual void getPrototype(Vertica::ServerInterface &,
+	                          Vertica::ColumnTypes &argTypes,
+	                          Vertica::ColumnTypes &resTypes)
+	{
+		argTypes.addLongVarchar();
+		argTypes.addVarchar();
+		resTypes.addLongVarchar();
+	}
+
+	virtual void getReturnType(Vertica::ServerInterface &,
+	                           const Vertica::SizedColumnTypes &argTypes,
+	                           Vertica::SizedColumnTypes &resTypes)
+	{
+		const Vertica::VerticaType &jsonSrcType = argTypes.getColumnType(0);
+		resTypes.addLongVarchar(jsonSrcType.getStringLength());
+	}
+};
+
+
+
 class JsonQueryFactory : public AbstractJsonQueryFactory {
 public:
 
@@ -113,7 +136,38 @@ public:
 	}
 };
 
+class JsonQueryLongFactory : public AbstractJsonQueryLongFactory {
+public:
+
+	virtual ScalarFunction *createScalarFunction(Vertica::ServerInterface &iface)
+	{
+		return vt_createFuncObj(iface.allocator, JsonQuery);
+	}
+};
+
+class JsonQueryStringLongFactory : public AbstractJsonQueryLongFactory {
+public:
+
+	virtual ScalarFunction *createScalarFunction(Vertica::ServerInterface &iface)
+	{
+		return vt_createFuncObj(iface.allocator, JsonQueryString);
+	}
+};
+
+class JsonQueryUnquotedLongFactory : public AbstractJsonQueryLongFactory {
+public:
+
+	virtual ScalarFunction *createScalarFunction(Vertica::ServerInterface &iface)
+	{
+		return vt_createFuncObj(iface.allocator, JsonQueryUnquoted);
+	}
+};
+
+
 
 RegisterFactory(JsonQueryFactory);
 RegisterFactory(JsonQueryStringFactory);
 RegisterFactory(JsonQueryUnquotedFactory);
+RegisterFactory(JsonQueryLongFactory);
+RegisterFactory(JsonQueryStringLongFactory);
+RegisterFactory(JsonQueryUnquotedLongFactory);
