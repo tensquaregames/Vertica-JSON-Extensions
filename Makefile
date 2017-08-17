@@ -10,7 +10,7 @@ CXXFLAGS+=-g
 endif
 ifndef DEBUG
 CFLAGS+=-O3
-CXXFLAGS+=-O3
+CXXFLAGS+=-O2
 endif
 
 VSQL?=vsql
