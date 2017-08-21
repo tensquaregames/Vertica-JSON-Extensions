@@ -14,6 +14,8 @@ public:
 
 	static void copyResult(const json_slice_t &json, Vertica::VString &result)
 	{
+		/* The function fails when g++ O3 level of optimization is used (Vertica v8.1.1-0)
+		*/
 		result.copy(json.src, json.len);
 	}
 };

@@ -4,6 +4,11 @@ CXX=g++
 CXXFLAGS=-std=c++98 -Wall -Wextra -pedantic -fPIC
 LDFLAGS=-shared
 
+# Using O2 flag for C++ was forced by fatal errors in function
+# VString::copy(const char*) when O3 was used. That behavior occured in
+# Vertica 8.1.1-0 and a couple of earlier versions. As a workaround the
+# O2 optimization level is used.
+
 ifdef DEBUG
 CFLAGS+=-g
 CXXFLAGS+=-g
