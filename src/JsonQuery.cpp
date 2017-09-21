@@ -18,18 +18,21 @@ public:
 	                          Vertica::BlockWriter &resWriter)
 	{
 		do {
-			const Vertica::VString &jsonSrc = argReader.getStringRef(0);
-			const Vertica::VString &querySrc = argReader.getStringRef(1);
 			Vertica::VString &resSrc = resWriter.getStringRef();
-
-			json_slice_t jsonIn = json_slice_new(jsonSrc.data(), jsonSrc.length());
-			json_slice_t jsonOut;
-			if (json_slice_query(&jsonIn,
-			                     querySrc.data(), querySrc.length(),
-			                     &jsonOut)) {
-				Q::copyResult(jsonOut, resSrc);
-			} else {
+			if (argReader.isNull(0) || argReader.isNull(1)) {
 				resSrc.setNull();
+			} else {
+				const Vertica::VString &jsonSrc = argReader.getStringRef(0);
+				const Vertica::VString &querySrc = argReader.getStringRef(1);
+				json_slice_t jsonIn = json_slice_new(jsonSrc.data(), jsonSrc.length());
+				json_slice_t jsonOut;
+				if (json_slice_query(&jsonIn,
+						     querySrc.data(), querySrc.length(),
+						     &jsonOut)) {
+					Q::copyResult(jsonOut, resSrc);
+				} else {
+					resSrc.setNull();
+				}
 			}
 			resWriter.next();
 		} while (argReader.next());
