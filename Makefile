@@ -1,7 +1,7 @@
 CC=gcc
 CFLAGS=-std=c99 -Wall -Wextra -pedantic -fPIC
 CXX=g++
-CXXFLAGS=-std=c++98 -Wall -Wextra -pedantic -fPIC -D_GLIBCXX_USE_CXX11_ABI=0
+CXXFLAGS=-std=c++98 -std=c++11 -Wall -Wextra -pedantic -fPIC -D_GLIBCXX_USE_CXX11_ABI=0
 LDFLAGS=-shared
 
 # Using O2 flag for C++ was forced by fatal errors in function
