@@ -26,7 +26,7 @@ VERTICA_SDK_INCLUDE=$(SDK)/include
 INCLUDE=include/
 
 
-.PHONY: build test memtest examples clean
+.PHONY: build install grant_permissions uninstall test memtest examples clean
 
 
 # Auxiliary tasks.
@@ -49,6 +49,9 @@ examples:
 	$(VSQL) -f examples/unnest.sql
 
 install: ddl/install.sql lib/JsonLib.so
+	$(VSQL) -f $<
+
+grant_permissions: ddl/grant_permissions.sql
 	$(VSQL) -f $<
 
 uninstall: ddl/uninstall.sql
