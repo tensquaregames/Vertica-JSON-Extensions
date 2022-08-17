@@ -83,7 +83,10 @@ You can also specify custom `vsql` command used for installation using the
     make VSQL="vsql -U foo -h bar baz" install
 
 Alternatively, you can load the install script located in `ddl/install.sql`
-manually.
+manually. To allow other users to execute installed method, permissions have to be granted explicitly:
+```
+make grant_permissions
+```
 
 
 Testing

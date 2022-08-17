@@ -1,0 +1,12 @@
+GRANT EXECUTE ON FUNCTION public.JsonQuery (varchar, varchar) TO public;
+GRANT EXECUTE ON FUNCTION public.JsonQueryString (varchar, varchar) TO public;
+GRANT EXECUTE ON FUNCTION public.JsonQueryUnquoted (varchar, varchar) TO public;
+GRANT EXECUTE ON FUNCTION public.JsonQuery (long varchar, varchar) TO public;
+GRANT EXECUTE ON FUNCTION public.JsonQueryString (long varchar, varchar) TO public;
+GRANT EXECUTE ON FUNCTION public.JsonQueryUnquoted (long varchar, varchar) TO public;
+GRANT EXECUTE ON TRANSFORM FUNCTION public.JsonArrayUnnest (varchar) TO public;
+GRANT EXECUTE ON TRANSFORM FUNCTION public.JsonArrayUnnestStrings (varchar) TO public;
+GRANT EXECUTE ON TRANSFORM FUNCTION public.JsonArrayUnnestUnquoted (varchar) TO public;
+GRANT EXECUTE ON TRANSFORM FUNCTION public.JsonArrayUnnest (long varchar) TO public;
+GRANT EXECUTE ON TRANSFORM FUNCTION public.JsonArrayUnnestStrings (long varchar) TO public;
+GRANT EXECUTE ON TRANSFORM FUNCTION public.JsonArrayUnnestUnquoted (long varchar) TO public;
