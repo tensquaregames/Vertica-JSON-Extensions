@@ -89,7 +89,7 @@ public:
 	}
 };
 
-class AbstractJsonQueryLongFactory : public ScalarFunctionFactory {
+class AbstractJsonQueryLongFactory : public AbstractJsonQueryFactory {
 public:
 
 	virtual void getPrototype(Vertica::ServerInterface &,
